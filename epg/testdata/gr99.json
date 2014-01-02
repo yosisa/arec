@@ -1,0 +1,17 @@
+[{
+    "name": "Ｔｅｓｔ　ＴＶ１",
+    "id": "GR0_01",
+    "programs": [{
+        "event_id": 100,
+        "channel": "GR0_01",
+        "title": "番組１",
+        "detail": "description here",
+        "start": 1.3886532e+13,
+        "end": 1.3886541e+13,
+        "duration": 900,
+        "category": [{
+            "large": {"ja_JP": "アニメ／特撮", "en": "anime"},
+            "middle": {"ja_JP": "国内アニメ", "en": "Japanese animation"}
+        }]
+    }]
+}]
