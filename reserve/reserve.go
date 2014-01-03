@@ -4,7 +4,6 @@ import (
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"log"
-	"reflect"
 )
 
 type Channel struct {
@@ -51,13 +50,18 @@ func (self *Channel) Save() error {
 		log.Printf("Add new channel: %s %s", self.Id, self.Name)
 		return collection.Insert(self)
 	}
-	if reflect.DeepEqual(self, saved) {
+	if self.Equal(&saved) {
 		return nil
 	}
 
 	log.Printf("Update channel: %s %s", self.Id, self.Name)
 	log.Printf("Old: %+v, New: %+v", saved, *self)
 	return collection.Update(bson.M{"_id": self.Id}, self)
+}
+
+func (self *Channel) Equal(other *Channel) bool {
+	return self.Id == other.Id &&
+		self.Name == other.Name
 }
 
 func GetProgram(event_id int) (Program, error) {

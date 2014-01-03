@@ -6,7 +6,19 @@ import (
 	"testing"
 )
 
-func TestEqual(t *testing.T) {
+func TestChannelEqual(t *testing.T) {
+	c1 := Channel{
+		Id:   "GR0_01",
+		Name: "Test TV1",
+	}
+	c2 := c1
+	assert.True(t, c1.Equal(&c2))
+
+	c2.Name = "Test TV2"
+	assert.False(t, c1.Equal(&c2))
+}
+
+func TestProgramEqual(t *testing.T) {
 	p1 := Program{
 		EventId:  1,
 		Title:    "番組1",
