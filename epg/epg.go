@@ -3,6 +3,7 @@ package epg
 import (
 	"code.google.com/p/go.text/unicode/norm"
 	"encoding/json"
+	"github.com/yosisa/arec/reserve"
 	"io"
 )
 
@@ -44,4 +45,24 @@ func DecodeJson(r io.Reader) ([]Channel, error) {
 	dec := json.NewDecoder(rr)
 	var channels []Channel
 	return channels, dec.Decode(&channels)
+}
+
+func (self *Channel) Save() error {
+	ch := reserve.Channel{self.Id, self.Name}
+	return ch.Save()
+}
+
+func (self *Program) Save() error {
+	return self.toDocument().Save()
+}
+
+func (self *Program) toDocument() *reserve.Program {
+	return &reserve.Program{
+		EventId:  self.EventId,
+		Title:    self.Title,
+		Detail:   self.Detail,
+		Start:    int(self.Start / 10000),
+		End:      int(self.End / 10000),
+		Duration: self.Duration,
+	}
 }
