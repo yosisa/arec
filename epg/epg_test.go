@@ -5,6 +5,7 @@ import (
 	"github.com/yosisa/arec/reserve"
 	"os"
 	"testing"
+	"time"
 )
 
 func TestDeocdeJson(t *testing.T) {
@@ -34,13 +35,15 @@ func TestProgramToDocument(t *testing.T) {
 
 	channels, err := DecodeJson(f)
 	program := channels[0].Programs[0]
-	pg := program.toDocument()
+	now := time.Now().Unix()
+	pg := program.toDocument(now)
 	assert.Equal(t, pg, &reserve.Program{
-		EventId:  100,
-		Title:    "番組1",
-		Detail:   "description here",
-		Start:    1388653200,
-		End:      1388654100,
-		Duration: 900,
+		EventId:   100,
+		Title:     "番組1",
+		Detail:    "description here",
+		Start:     1388653200,
+		End:       1388654100,
+		Duration:  900,
+		UpdatedAt: int(now),
 	})
 }

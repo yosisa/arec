@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/yosisa/arec/reserve"
 	"io"
+	"time"
 )
 
 type Channel struct {
@@ -47,22 +48,40 @@ func DecodeJson(r io.Reader) ([]Channel, error) {
 	return channels, dec.Decode(&channels)
 }
 
+func SaveEPG(r io.Reader) error {
+	channels, err := DecodeJson(r)
+	if err != nil {
+		return err
+	}
+
+	now := time.Now().Unix()
+	for _, channel := range channels {
+		channel.Save()
+		for _, program := range channel.Programs {
+			program.Save(now)
+		}
+	}
+
+	return nil
+}
+
 func (self *Channel) Save() error {
 	ch := reserve.Channel{self.Id, self.Name}
 	return ch.Save()
 }
 
-func (self *Program) Save() error {
-	return self.toDocument().Save()
+func (self *Program) Save(now int64) error {
+	return self.toDocument(now).Save()
 }
 
-func (self *Program) toDocument() *reserve.Program {
+func (self *Program) toDocument(now int64) *reserve.Program {
 	return &reserve.Program{
-		EventId:  self.EventId,
-		Title:    self.Title,
-		Detail:   self.Detail,
-		Start:    int(self.Start / 10000),
-		End:      int(self.End / 10000),
-		Duration: self.Duration,
+		EventId:   self.EventId,
+		Title:     self.Title,
+		Detail:    self.Detail,
+		Start:     int(self.Start / 10000),
+		End:       int(self.End / 10000),
+		Duration:  self.Duration,
+		UpdatedAt: int(now),
 	}
 }
