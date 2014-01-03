@@ -3,6 +3,7 @@ package reserve
 import (
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
+	"log"
 	"reflect"
 )
 
@@ -47,11 +48,15 @@ func (self *Channel) Save() error {
 	collection := getCollection("channel")
 	saved, err := GetChannel(&self.Id)
 	if err != nil {
+		log.Printf("Add new channel: %s %s", self.Id, self.Name)
 		return collection.Insert(self)
 	}
 	if reflect.DeepEqual(self, saved) {
 		return nil
 	}
+
+	log.Printf("Update channel: %s %s", self.Id, self.Name)
+	log.Printf("Old: %+v, New: %+v", saved, *self)
 	return collection.Update(bson.M{"_id": self.Id}, self)
 }
 
@@ -65,14 +70,17 @@ func (self *Program) Save() error {
 	collection := getCollection("program")
 	saved, err := GetProgram(self.EventId)
 	if err != nil {
+		log.Printf("Add new program: %d %d %s", self.EventId, self.Start, self.Title)
 		self.Id = bson.NewObjectId()
 		return collection.Insert(self)
 	}
-
 	if self.Equal(&saved) {
 		return nil
 	}
+
+	log.Printf("Update program: %d %d %s", self.EventId, self.Start, self.Title)
 	self.Id = saved.Id
+	log.Printf("Old: %+v, New: %+v", saved, *self)
 	return collection.Update(saved, self)
 }
 
