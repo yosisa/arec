@@ -70,7 +70,7 @@ func (self *Scheduler) Refresh() {
 		"reserved_by": bson.M{"$not": bson.M{"$size": 0}},
 		"end":         bson.M{"$gt": int(time.Now().Unix())},
 	}
-	iter := collection.Find(query).Iter()
+	iter := collection.Find(query).Sort("start").Iter()
 	defer iter.Close()
 	for iter.Next(&program) {
 		if _, ok := self.activeItems[program.EventId]; !ok {
