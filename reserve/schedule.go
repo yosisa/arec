@@ -33,9 +33,12 @@ func (self *Schedule) Start() {
 			case <-self.cancelCh:
 			}
 		}()
-	} else {
+	} else if rest := wait + self.Duration; rest > 0 {
+		self.Duration = rest
 		log.Printf("Recording for %d is starting immediately", self.EventId)
 		go self.Record()
+	} else {
+		log.Printf("Program %d is already finished", self.EventId)
 	}
 }
 
@@ -63,7 +66,12 @@ func NewScheduler() *Scheduler {
 func (self *Scheduler) Refresh() {
 	var program Program
 	collection := getCollection("program")
-	iter := collection.Find(bson.M{"reserved_by": bson.M{"$not": bson.M{"$size": 0}}}).Iter()
+	query := bson.M{
+		"reserved_by": bson.M{"$not": bson.M{"$size": 0}},
+		"end":         bson.M{"$gt": int(time.Now().Unix())},
+	}
+	iter := collection.Find(query).Iter()
+	defer iter.Close()
 	for iter.Next(&program) {
 		if _, ok := self.activeItems[program.EventId]; !ok {
 			s := NewSchedule()
