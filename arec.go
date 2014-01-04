@@ -29,4 +29,7 @@ func main() {
 		log.Print(err)
 	}
 	reserve.ApplyAllRules(0)
+
+	schedular := reserve.NewScheduler()
+	schedular.RunForever()
 }
