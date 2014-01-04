@@ -23,4 +23,9 @@ func main() {
 	if err := epg.SaveEPG(os.Stdin); err != nil {
 		log.Fatal(err)
 	}
+
+	rule := reserve.Rule{Keyword: "test"}
+	if err := rule.Save(); err != nil {
+		log.Print(err)
+	}
 }
