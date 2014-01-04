@@ -49,7 +49,7 @@ func (self *Schedule) Cancel() {
 func (self *Schedule) Record() {
 	log.Printf("Start recording: %d, duration: %d", self.EventId, self.Duration)
 	// fake recording
-	time.Sleep(time.Duration(self.Duration/60) * time.Second)
+	time.Sleep(time.Duration(self.Duration) * time.Second)
 	log.Printf("Finish recording: %d", self.EventId)
 }
 
