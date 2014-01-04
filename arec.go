@@ -24,8 +24,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	rule := reserve.Rule{Keyword: "test"}
+	rule := reserve.Rule{Keyword: "news"}
 	if err := rule.Save(); err != nil {
 		log.Print(err)
 	}
+	reserve.ApplyAllRules(0)
 }
