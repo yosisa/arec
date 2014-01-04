@@ -12,14 +12,15 @@ type Channel struct {
 }
 
 type Program struct {
-	Id        bson.ObjectId `bson:"_id,omitempty"`
-	EventId   int           `bson:"event_id"`
-	Title     string
-	Detail    string
-	Start     int
-	End       int
-	Duration  int
-	UpdatedAt int `bson:"updated_at"`
+	Id         bson.ObjectId `bson:"_id,omitempty"`
+	EventId    int           `bson:"event_id"`
+	Title      string
+	Detail     string
+	Start      int
+	End        int
+	Duration   int
+	ReservedBy []bson.ObjectId `bson:"reserved_by"`
+	UpdatedAt  int             `bson:"updated_at"`
 }
 
 var session *mgo.Session
