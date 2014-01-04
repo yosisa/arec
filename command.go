@@ -1,24 +1,43 @@
 package main
 
 import (
-	"flag"
-	"github.com/rakyll/command"
+	"github.com/voxelbrain/goptions"
 	"github.com/yosisa/arec/epg"
 	"github.com/yosisa/arec/reserve"
 	"log"
 	"os"
 )
 
-var configFile *string = flag.String("config", "./arec.json", "path to config file")
+type CmdOptions struct {
+	Config string        `goptions:"-c, --config, description='Path to config file'"`
+	Help   goptions.Help `goptions:"-h, --help, description='Show this help'"`
+	goptions.Verbs
 
-type EPGCommand struct {
+	EPG       struct{} `goptions:"epg"`
+	Scheduler struct{} `goptions:"scheduler"`
+	Rule      struct {
+		Keyword string `goptions:"--keyword, obligatory, description='regex for title'"`
+	} `goptions:"rule"`
 }
 
-func (cmd *EPGCommand) Flags(fs *flag.FlagSet) *flag.FlagSet {
-	return fs
+type SubCommand func(options *CmdOptions)
+
+var commands map[string]SubCommand
+
+func SchedulerCommand(options *CmdOptions) {
+	scheduler := reserve.NewScheduler()
+	scheduler.RunForever()
 }
 
-func (cmd *EPGCommand) Run(args []string) {
+func RuleCommand(options *CmdOptions) {
+	rule := reserve.Rule{Keyword: options.Rule.Keyword}
+	if err := rule.Save(); err != nil {
+		log.Fatal(err)
+	}
+	rule.Apply(0)
+}
+
+func EPGCommand(options *CmdOptions) {
 	if err := epg.SaveEPG(os.Stdin); err != nil {
 		log.Fatal(err)
 	}
@@ -30,19 +49,10 @@ func (cmd *EPGCommand) Run(args []string) {
 	reserve.ApplyAllRules(0)
 }
 
-type SchedulerCommand struct {
-}
-
-func (cmd *SchedulerCommand) Flags(fs *flag.FlagSet) *flag.FlagSet {
-	return fs
-}
-
-func (cmd *SchedulerCommand) Run(args []string) {
-	scheduler := reserve.NewScheduler()
-	scheduler.RunForever()
-}
-
 func init() {
-	command.On("epg", "get and update epg data", &EPGCommand{})
-	command.On("scheduler", "record programs", &SchedulerCommand{})
+	commands = map[string]SubCommand{
+		"scheduler": SchedulerCommand,
+		"rule":      RuleCommand,
+		"epg":       EPGCommand,
+	}
 }
