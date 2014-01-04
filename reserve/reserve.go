@@ -8,18 +8,18 @@ import (
 
 type Channel struct {
 	Id   string `bson:"_id"`
-	Name string `bson:"name"`
+	Name string
 }
 
 type Program struct {
-	Id        bson.ObjectId `bson:"_id"`
+	Id        bson.ObjectId `bson:"_id,omitempty"`
 	EventId   int           `bson:"event_id"`
-	Title     string        `bson:"title"`
-	Detail    string        `bson:"detail"`
-	Start     int           `bson:"start"`
-	End       int           `bson:"end"`
-	Duration  int           `bson:"duration"`
-	UpdatedAt int           `bson:"updated_at"`
+	Title     string
+	Detail    string
+	Start     int
+	End       int
+	Duration  int
+	UpdatedAt int `bson:"updated_at"`
 }
 
 var session *mgo.Session
@@ -76,7 +76,6 @@ func (self *Program) Save() error {
 	saved, err := GetProgram(self.EventId)
 	if err != nil {
 		log.Printf("Add new program: %d %d %s", self.EventId, self.Start, self.Title)
-		self.Id = bson.NewObjectId()
 		return collection.Insert(self)
 	}
 	if self.Equal(&saved) {
