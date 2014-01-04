@@ -8,7 +8,7 @@ import (
 )
 
 type Rule struct {
-	Id      bson.ObjectId `bson:"_id,omitempty"`
+	Id      bson.ObjectId `bson:"_id"`
 	Hash    []byte
 	Keyword string
 }
@@ -32,6 +32,7 @@ func (self *Rule) Save() error {
 	}
 
 	if !self.Id.Valid() {
+		self.Id = bson.NewObjectId()
 		log.Printf("Add new rule: %+v", *self)
 		return collection.Insert(self)
 	} else {
