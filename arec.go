@@ -1,17 +1,13 @@
 package main
 
 import (
-	"flag"
-	"github.com/yosisa/arec/epg"
+	"github.com/rakyll/command"
 	"github.com/yosisa/arec/reserve"
 	"log"
-	"os"
 )
 
-var configFile *string = flag.String("config", "./arec.json", "path to config file")
-
 func main() {
-	flag.Parse()
+	command.Parse()
 
 	config, err := LoadConfig(configFile)
 	if err != nil {
@@ -20,16 +16,5 @@ func main() {
 	log.Printf("Configuration loaded: %s", *configFile)
 	reserve.Connect(config.MongoURI)
 
-	if err := epg.SaveEPG(os.Stdin); err != nil {
-		log.Fatal(err)
-	}
-
-	rule := reserve.Rule{Keyword: "news"}
-	if err := rule.Save(); err != nil {
-		log.Print(err)
-	}
-	reserve.ApplyAllRules(0)
-
-	schedular := reserve.NewScheduler()
-	schedular.RunForever()
+	command.Run()
 }
