@@ -13,7 +13,10 @@ type CmdOptions struct {
 	Help   goptions.Help `goptions:"-h, --help, description='Show this help'"`
 	goptions.Verbs
 
-	EPG       struct{} `goptions:"epg"`
+	EPG struct {
+		Channel int      `goptions:"--ch, description='Get specified channel only'"`
+		File    *os.File `goptions:"--file, rdonly, description='Feed from json file'"`
+	} `goptions:"epg"`
 	Scheduler struct{} `goptions:"scheduler"`
 	Rule      struct {
 		Keyword string `goptions:"--keyword, obligatory, description='regex for title'"`
@@ -38,10 +41,13 @@ func RuleCommand(options *CmdOptions) {
 }
 
 func EPGCommand(options *CmdOptions) {
-	if err := epg.SaveEPG(os.Stdin); err != nil {
-		log.Fatal(err)
+	if options.EPG.File != nil {
+		defer options.EPG.File.Close()
+		if err := epg.SaveEPG(options.EPG.File); err != nil {
+			log.Fatal(err)
+		}
+		reserve.ApplyAllRules(0)
 	}
-	reserve.ApplyAllRules(0)
 }
 
 func init() {
