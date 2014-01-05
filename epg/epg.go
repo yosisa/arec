@@ -3,6 +3,7 @@ package epg
 import (
 	"code.google.com/p/go.text/unicode/norm"
 	"encoding/json"
+	"fmt"
 	"github.com/yosisa/arec/reserve"
 	"io"
 	"time"
@@ -76,7 +77,7 @@ func (self *Program) Save(now int64) error {
 
 func (self *Program) toDocument(now int64) *reserve.Program {
 	return &reserve.Program{
-		EventId:   self.EventId,
+		EventId:   fmt.Sprintf("epg:%s:%d", self.Channel, self.EventId),
 		Title:     self.Title,
 		Detail:    self.Detail,
 		Start:     int(self.Start / 10000),

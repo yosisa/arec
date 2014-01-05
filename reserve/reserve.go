@@ -16,7 +16,7 @@ type Channel struct {
 type Program struct {
 	Id         bson.ObjectId `bson:"_id,omitempty"`
 	Hash       []byte
-	EventId    int `bson:"event_id"`
+	EventId    string `bson:"event_id"`
 	Title      string
 	Detail     string
 	Start      int
@@ -91,10 +91,10 @@ func (self *Program) Save() error {
 		return err
 	}
 	if info.UpsertedId != nil {
-		log.Printf("Add new program: %d %d %s", self.EventId, self.Start, self.Title)
+		log.Printf("Add new program: %s %d %s", self.EventId, self.Start, self.Title)
 	}
 	if info.Updated > 0 {
-		log.Printf("Update program: %d %d %s", self.EventId, self.Start, self.Title)
+		log.Printf("Update program: %s %d %s", self.EventId, self.Start, self.Title)
 	}
 	return nil
 }

@@ -20,7 +20,7 @@ func TestChannelEqual(t *testing.T) {
 
 func TestProgramMakeHash(t *testing.T) {
 	p1 := Program{
-		EventId:  1,
+		EventId:  "GR0_01:1",
 		Title:    "番組1",
 		Detail:   "description here",
 		Start:    1388653200,
@@ -33,6 +33,6 @@ func TestProgramMakeHash(t *testing.T) {
 	p2.Id = bson.NewObjectId()
 	assert.Equal(t, p1.MakeHash(), p2.MakeHash())
 
-	p2.EventId = 2
+	p2.EventId = "GR0_01:2"
 	assert.NotEqual(t, p1.MakeHash(), p2.MakeHash())
 }

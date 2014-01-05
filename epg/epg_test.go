@@ -38,7 +38,7 @@ func TestProgramToDocument(t *testing.T) {
 	now := time.Now().Unix()
 	pg := program.toDocument(now)
 	assert.Equal(t, pg, &reserve.Program{
-		EventId:   100,
+		EventId:   "epg:GR0_01:100",
 		Title:     "番組1",
 		Detail:    "description here",
 		Start:     1388653200,

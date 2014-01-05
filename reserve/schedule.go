@@ -10,7 +10,7 @@ import (
 )
 
 type Schedule struct {
-	EventId   int
+	EventId   string
 	StartTime int
 	Duration  int
 	timer     *time.Timer
@@ -57,12 +57,12 @@ func (self *Schedule) Record() {
 }
 
 type Scheduler struct {
-	activeItems map[int]*Schedule
+	activeItems map[string]*Schedule
 }
 
 func NewScheduler() *Scheduler {
 	scheduler := new(Scheduler)
-	scheduler.activeItems = make(map[int]*Schedule)
+	scheduler.activeItems = make(map[string]*Schedule)
 	return scheduler
 }
 
