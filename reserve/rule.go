@@ -72,7 +72,7 @@ func (self *Rule) Apply(timestamp int) error {
 	if err != nil {
 		return err
 	} else if info.Updated > 0 {
-		log.Printf("Reserved %d programs by %v", info.Updated, self.Id)
+		log.Printf("Reserved %d programs by %+v", info.Updated, *self)
 	}
 	return nil
 }
