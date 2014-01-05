@@ -21,9 +21,9 @@ func main() {
 
 	config, err := LoadConfig(&options.Config)
 	if err != nil {
-		log.Fatalf("Load configuration failed: %v", options.Config, err)
+		log.Fatalf("Load configuration from %s failed: %v", options.Config, err)
 	}
-	log.Printf("Configuration loaded: %s", &options.Config)
+	log.Printf("Configuration loaded from %s", options.Config)
 	reserve.Connect(config.MongoURI)
 
 	command(&options)

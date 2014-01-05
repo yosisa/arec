@@ -28,7 +28,7 @@ func (self *Schedule) Start() {
 	wait := self.StartTime - int(now)
 	if wait > 0 {
 		self.timer = time.NewTimer(time.Duration(wait) * time.Second)
-		log.Printf("Recording for %d scheduled after %d seconds", self.EventId, wait)
+		log.Printf("Recording for %s scheduled after %d seconds", self.EventId, wait)
 		go func() {
 			select {
 			case <-self.timer.C:
@@ -38,10 +38,10 @@ func (self *Schedule) Start() {
 		}()
 	} else if rest := wait + self.Duration; rest > 0 {
 		self.Duration = rest
-		log.Printf("Recording for %d is starting immediately", self.EventId)
+		log.Printf("Recording for %s is starting immediately", self.EventId)
 		go self.Record()
 	} else {
-		log.Printf("Program %d is already finished", self.EventId)
+		log.Printf("Program %s is already finished", self.EventId)
 	}
 }
 
@@ -50,10 +50,10 @@ func (self *Schedule) Cancel() {
 }
 
 func (self *Schedule) Record() {
-	log.Printf("Start recording: %d, duration: %d", self.EventId, self.Duration)
+	log.Printf("Start recording: %s, duration: %d", self.EventId, self.Duration)
 	// fake recording
 	time.Sleep(time.Duration(self.Duration) * time.Second)
-	log.Printf("Finish recording: %d", self.EventId)
+	log.Printf("Finish recording: %s", self.EventId)
 }
 
 type Scheduler struct {
