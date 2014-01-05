@@ -1,6 +1,8 @@
 package reserve
 
 import (
+	"crypto/md5"
+	"fmt"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"log"
@@ -13,7 +15,8 @@ type Channel struct {
 
 type Program struct {
 	Id         bson.ObjectId `bson:"_id,omitempty"`
-	EventId    int           `bson:"event_id"`
+	Hash       []byte
+	EventId    int `bson:"event_id"`
 	Title      string
 	Detail     string
 	Start      int
@@ -73,27 +76,38 @@ func GetProgram(event_id int) (Program, error) {
 }
 
 func (self *Program) Save() error {
+	self.Hash = self.MakeHash()
 	collection := getCollection("program")
-	saved, err := GetProgram(self.EventId)
-	if err != nil {
-		log.Printf("Add new program: %d %d %s", self.EventId, self.Start, self.Title)
-		return collection.Insert(self)
-	}
-	if self.Equal(&saved) {
+
+	// check duplication
+	if n, err := collection.Find(bson.M{"hash": self.Hash}).Count(); err != nil {
+		return err
+	} else if n != 0 {
 		return nil
 	}
 
-	log.Printf("Update program: %d %d %s", self.EventId, self.Start, self.Title)
-	self.Id = saved.Id
-	log.Printf("Old: %+v, New: %+v", saved, *self)
-	return collection.Update(saved, self)
+	info, err := collection.Upsert(bson.M{"event_id": self.EventId}, self)
+	if err != nil {
+		return err
+	}
+	if info.UpsertedId != nil {
+		log.Printf("Add new program: %d %d %s", self.EventId, self.Start, self.Title)
+	}
+	if info.Updated > 0 {
+		log.Printf("Update program: %d %d %s", self.EventId, self.Start, self.Title)
+	}
+	return nil
 }
 
-func (self *Program) Equal(other *Program) bool {
-	return self.EventId == other.EventId &&
-		self.Title == other.Title &&
-		self.Detail == other.Detail &&
-		self.Start == other.Start &&
-		self.End == other.End &&
-		self.Duration == other.Duration
+func (self *Program) MakeHash() []byte {
+	hasher := md5.New()
+	fmt.Fprintf(hasher, "%v", []interface{}{
+		self.EventId,
+		self.Title,
+		self.Detail,
+		self.Start,
+		self.End,
+		self.Duration,
+	})
+	return hasher.Sum(nil)
 }

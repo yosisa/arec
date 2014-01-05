@@ -18,7 +18,7 @@ func TestChannelEqual(t *testing.T) {
 	assert.False(t, c1.Equal(&c2))
 }
 
-func TestProgramEqual(t *testing.T) {
+func TestProgramMakeHash(t *testing.T) {
 	p1 := Program{
 		EventId:  1,
 		Title:    "番組1",
@@ -28,11 +28,11 @@ func TestProgramEqual(t *testing.T) {
 		Duration: 900,
 	}
 	p2 := p1
-	assert.True(t, p1.Equal(&p2))
+	assert.Equal(t, p1.MakeHash(), p2.MakeHash())
 
 	p2.Id = bson.NewObjectId()
-	assert.True(t, p1.Equal(&p2))
+	assert.Equal(t, p1.MakeHash(), p2.MakeHash())
 
 	p2.EventId = 2
-	assert.False(t, p1.Equal(&p2))
+	assert.NotEqual(t, p1.MakeHash(), p2.MakeHash())
 }
