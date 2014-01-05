@@ -3,6 +3,9 @@ package reserve
 import (
 	"labix.org/v2/mgo/bson"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -92,6 +95,15 @@ func (self *Scheduler) Shutdown(force bool) {
 
 func (self *Scheduler) RunForever() {
 	self.Refresh()
-	ch := make(chan bool)
-	<-ch
+	signalCh := make(chan os.Signal, 4)
+	signal.Notify(signalCh, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT)
+	for {
+		switch <-signalCh {
+		case syscall.SIGHUP:
+			log.Printf("Rescheduling")
+			self.Refresh()
+		default:
+			os.Exit(0)
+		}
+	}
 }
