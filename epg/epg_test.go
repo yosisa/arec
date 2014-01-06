@@ -60,6 +60,7 @@ func TestProgramToDocument(t *testing.T) {
 		EventId:   "epg:GR0_9:100",
 		Title:     "番組1",
 		Detail:    "description here",
+		Category:  []string{"アニメ/特撮", "anime", "国内アニメ", "Japanese animation"},
 		Start:     1388653200,
 		End:       1388654100,
 		Duration:  900,

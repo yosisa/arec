@@ -150,11 +150,17 @@ func (self *Program) Save(now int64) error {
 }
 
 func (self *Program) toDocument(now int64) *reserve.Program {
+	category := make([]string, 0)
+	for _, cat := range self.Categories {
+		category = append(category, cat.Large.Ja, cat.Large.En, cat.Middle.Ja, cat.Middle.En)
+	}
+
 	return &reserve.Program{
 		Channel:   self.Channel,
 		EventId:   fmt.Sprintf("epg:%s:%d", self.Channel, self.EventId),
 		Title:     self.Title,
 		Detail:    self.Detail,
+		Category:  category,
 		Start:     int(self.Start / 10000),
 		End:       int(self.End / 10000),
 		Duration:  self.Duration,

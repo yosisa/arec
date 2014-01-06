@@ -22,6 +22,7 @@ type Program struct {
 	EventId    string `bson:"event_id"`
 	Title      string
 	Detail     string
+	Category   []string
 	Start      int
 	End        int
 	Duration   int
@@ -110,6 +111,7 @@ func (self *Program) MakeHash() []byte {
 		self.EventId,
 		self.Title,
 		self.Detail,
+		self.Category,
 		self.Start,
 		self.End,
 		self.Duration,
