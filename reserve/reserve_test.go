@@ -6,18 +6,6 @@ import (
 	"testing"
 )
 
-func TestChannelEqual(t *testing.T) {
-	c1 := Channel{
-		Id:   "GR0_01",
-		Name: "Test TV1",
-	}
-	c2 := c1
-	assert.True(t, c1.Equal(&c2))
-
-	c2.Name = "Test TV2"
-	assert.False(t, c1.Equal(&c2))
-}
-
 func TestProgramMakeHash(t *testing.T) {
 	p1 := Program{
 		EventId:  "GR0_01:1",

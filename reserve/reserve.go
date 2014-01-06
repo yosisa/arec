@@ -11,6 +11,8 @@ import (
 type Channel struct {
 	Id   string `bson:"_id"`
 	Name string
+	Ch   string
+	Sid  int
 }
 
 type Program struct {
@@ -50,23 +52,24 @@ func GetChannel(id *string) (Channel, error) {
 
 func (self *Channel) Save() error {
 	collection := getCollection("channel")
-	saved, err := GetChannel(&self.Id)
-	if err != nil {
-		log.Printf("Add new channel: %s %s", self.Id, self.Name)
-		return collection.Insert(self)
-	}
-	if self.Equal(&saved) {
+
+	if n, err := collection.Find(self).Count(); err != nil {
+		return err
+	} else if n != 0 {
 		return nil
 	}
 
-	log.Printf("Update channel: %s %s", self.Id, self.Name)
-	log.Printf("Old: %+v, New: %+v", saved, *self)
-	return collection.Update(bson.M{"_id": self.Id}, self)
-}
-
-func (self *Channel) Equal(other *Channel) bool {
-	return self.Id == other.Id &&
-		self.Name == other.Name
+	info, err := collection.UpsertId(self.Id, self)
+	if err != nil {
+		return err
+	}
+	if info.UpsertedId != nil {
+		log.Printf("Add new channel: %+v", *self)
+	}
+	if info.Updated > 0 {
+		log.Printf("Update channel: %+v", *self)
+	}
+	return nil
 }
 
 func GetProgram(event_id int) (Program, error) {

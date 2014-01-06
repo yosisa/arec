@@ -15,9 +15,10 @@ import (
 )
 
 type Channel struct {
-	Id       string
-	Name     string
-	Programs []Program
+	Id        string
+	Name      string
+	ServiceId int `json:"service_id"`
+	Programs  []Program
 }
 
 type Program struct {
@@ -54,7 +55,7 @@ func DecodeJson(r io.Reader) ([]Channel, error) {
 	return channels, dec.Decode(&channels)
 }
 
-func SaveEPG(r io.Reader) error {
+func SaveEPG(r io.Reader, ch string) error {
 	channels, err := DecodeJson(r)
 	if err != nil {
 		return err
@@ -62,7 +63,7 @@ func SaveEPG(r io.Reader) error {
 
 	now := time.Now().Unix()
 	for _, channel := range channels {
-		channel.Save()
+		channel.Save(ch)
 		for _, program := range channel.Programs {
 			program.Save(now)
 		}
@@ -131,9 +132,17 @@ func GetEPG(recpt1 string, epgdump string, ch string) (*bytes.Reader, error) {
 	return epg, nil
 }
 
-func (self *Channel) Save() error {
-	ch := reserve.Channel{self.Id, self.Name}
-	return ch.Save()
+func (self *Channel) Save(ch string) error {
+	return self.toDocument(ch).Save()
+}
+
+func (self *Channel) toDocument(ch string) *reserve.Channel {
+	return &reserve.Channel{
+		Id:   self.Id,
+		Name: self.Name,
+		Ch:   ch,
+		Sid:  self.ServiceId,
+	}
 }
 
 func (self *Program) Save(now int64) error {

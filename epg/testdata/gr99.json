@@ -1,9 +1,10 @@
 [{
     "name": "Ｔｅｓｔ　ＴＶ１",
-    "id": "GR0_01",
+    "id": "GR0_9",
+    "service_id": 9,
     "programs": [{
         "event_id": 100,
-        "channel": "GR0_01",
+        "channel": "GR0_9",
         "title": "番組１",
         "detail": "description here",
         "start": 1.3886532e+13,

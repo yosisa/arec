@@ -18,12 +18,30 @@ func TestDeocdeJson(t *testing.T) {
 	channels, err := DecodeJson(f)
 	ch := channels[0]
 	assert.Nil(t, err)
-	assert.Equal(t, ch.Id, "GR0_01")
+	assert.Equal(t, ch.Id, "GR0_9")
 	assert.Equal(t, ch.Name, "Test TV1")
-	assert.Equal(t, ch.Programs[0], Program{100, "GR0_01", "番組1", "description here",
+	assert.Equal(t, ch.Programs[0], Program{100, "GR0_9", "番組1", "description here",
 		nil, 1.3886532e+13, 1.3886541e+13, 900, []category{
 			category{categoryItem{"アニメ/特撮", "anime"},
 				categoryItem{"国内アニメ", "Japanese animation"}}}})
+}
+
+func TestChannelToDocument(t *testing.T) {
+	f, err := os.Open("testdata/gr99.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+
+	channels, err := DecodeJson(f)
+	channel := channels[0]
+	ch := channel.toDocument("1")
+	assert.Equal(t, ch, &reserve.Channel{
+		Id:   "GR0_9",
+		Name: "Test TV1",
+		Ch:   "1",
+		Sid:  9,
+	})
 }
 
 func TestProgramToDocument(t *testing.T) {
@@ -38,7 +56,7 @@ func TestProgramToDocument(t *testing.T) {
 	now := time.Now().Unix()
 	pg := program.toDocument(now)
 	assert.Equal(t, pg, &reserve.Program{
-		EventId:   "epg:GR0_01:100",
+		EventId:   "epg:GR0_9:100",
 		Title:     "番組1",
 		Detail:    "description here",
 		Start:     1388653200,

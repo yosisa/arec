@@ -14,8 +14,8 @@ type CmdOptions struct {
 	goptions.Verbs
 
 	EPG struct {
-		Channel int      `goptions:"--ch, description='Get specified channel only'"`
-		File    *os.File `goptions:"--file, rdonly, description='Feed from json file'"`
+		Ch   string   `goptions:"--ch, description='Get specified channel only'"`
+		File *os.File `goptions:"--file, rdonly, description='Feed from json file'"`
 	} `goptions:"epg"`
 	Scheduler struct{} `goptions:"scheduler"`
 	Rule      struct {
@@ -43,7 +43,7 @@ func RuleCommand(options *CmdOptions, config *Config) {
 func EPGCommand(options *CmdOptions, config *Config) {
 	if options.EPG.File != nil {
 		defer options.EPG.File.Close()
-		if err := epg.SaveEPG(options.EPG.File); err != nil {
+		if err := epg.SaveEPG(options.EPG.File, options.EPG.Ch); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -53,7 +53,7 @@ func EPGCommand(options *CmdOptions, config *Config) {
 		if err != nil {
 			log.Print(err)
 		} else {
-			if err := epg.SaveEPG(r); err != nil {
+			if err := epg.SaveEPG(r, channel.Ch); err != nil {
 				log.Fatal(err)
 			}
 		}
