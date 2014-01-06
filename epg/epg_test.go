@@ -62,6 +62,8 @@ func TestProgramToDocument(t *testing.T) {
 		Start:     1388653200,
 		End:       1388654100,
 		Duration:  900,
+		New:       false,
+		Final:     false,
 		Rerun:     false,
 		UpdatedAt: int(now),
 	})
@@ -75,7 +77,39 @@ func TestProgramToDocument(t *testing.T) {
 		Start:     1388654100,
 		End:       1388655000,
 		Duration:  900,
+		New:       false,
+		Final:     false,
 		Rerun:     true,
+		UpdatedAt: int(now),
+	})
+
+	assert.Equal(t, channels[0].Programs[2].toDocument(now), &reserve.Program{
+		Channel:   "GR0_9",
+		EventId:   "epg:GR0_9:102",
+		Title:     "番組1",
+		Detail:    "description here",
+		Category:  []string{"アニメ/特撮", "anime", "国内アニメ", "Japanese animation"},
+		Start:     1388655000,
+		End:       1388655900,
+		Duration:  900,
+		New:       true,
+		Final:     false,
+		Rerun:     true,
+		UpdatedAt: int(now),
+	})
+
+	assert.Equal(t, channels[0].Programs[3].toDocument(now), &reserve.Program{
+		Channel:   "GR0_9",
+		EventId:   "epg:GR0_9:103",
+		Title:     "番組1",
+		Detail:    "description here",
+		Category:  []string{"アニメ/特撮", "anime", "国内アニメ", "Japanese animation"},
+		Start:     1388655900,
+		End:       1388656800,
+		Duration:  900,
+		New:       false,
+		Final:     true,
+		Rerun:     false,
 		UpdatedAt: int(now),
 	})
 }

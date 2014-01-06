@@ -168,6 +168,16 @@ func (self *Program) toDocument(now int64) *reserve.Program {
 		UpdatedAt: int(now),
 	}
 
+	if strings.Contains(program.Title, "【新】") {
+		program.Title = strings.Replace(program.Title, "【新】", "", -1)
+		program.New = true
+	}
+
+	if strings.Contains(program.Title, "【終】") {
+		program.Title = strings.Replace(program.Title, "【終】", "", -1)
+		program.Final = true
+	}
+
 	if strings.Contains(program.Title, "【再】") {
 		program.Title = strings.Replace(program.Title, "【再】", "", -1)
 		program.Rerun = true
