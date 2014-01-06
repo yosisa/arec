@@ -151,6 +151,7 @@ func (self *Program) Save(now int64) error {
 
 func (self *Program) toDocument(now int64) *reserve.Program {
 	return &reserve.Program{
+		Channel:   self.Channel,
 		EventId:   fmt.Sprintf("epg:%s:%d", self.Channel, self.EventId),
 		Title:     self.Title,
 		Detail:    self.Detail,

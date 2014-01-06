@@ -18,6 +18,7 @@ type Channel struct {
 type Program struct {
 	Id         bson.ObjectId `bson:"_id,omitempty"`
 	Hash       []byte
+	Channel    string
 	EventId    string `bson:"event_id"`
 	Title      string
 	Detail     string
@@ -105,6 +106,7 @@ func (self *Program) Save() error {
 func (self *Program) MakeHash() []byte {
 	hasher := md5.New()
 	fmt.Fprintf(hasher, "%v", []interface{}{
+		self.Channel,
 		self.EventId,
 		self.Title,
 		self.Detail,

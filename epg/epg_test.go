@@ -56,6 +56,7 @@ func TestProgramToDocument(t *testing.T) {
 	now := time.Now().Unix()
 	pg := program.toDocument(now)
 	assert.Equal(t, pg, &reserve.Program{
+		Channel:   "GR0_9",
 		EventId:   "epg:GR0_9:100",
 		Title:     "番組1",
 		Detail:    "description here",
