@@ -15,6 +15,12 @@ import (
 	"time"
 )
 
+var flagMap map[string]string = map[string]string{
+	"新": "new",
+	"終": "final",
+	"再": "rerun",
+}
+
 type Channel struct {
 	Id        string
 	Name      string
@@ -168,19 +174,11 @@ func (self *Program) toDocument(now int64) *reserve.Program {
 		UpdatedAt: int(now),
 	}
 
-	if strings.Contains(program.Title, "【新】") {
-		program.Title = strings.Replace(program.Title, "【新】", "", -1)
-		program.New = true
-	}
-
-	if strings.Contains(program.Title, "【終】") {
-		program.Title = strings.Replace(program.Title, "【終】", "", -1)
-		program.Final = true
-	}
-
-	if strings.Contains(program.Title, "【再】") {
-		program.Title = strings.Replace(program.Title, "【再】", "", -1)
-		program.Rerun = true
+	for key, flag := range flagMap {
+		if symbol := "【" + key + "】"; strings.Contains(program.Title, symbol) {
+			program.Title = strings.Replace(program.Title, symbol, "", -1)
+			program.Flag = append(program.Flag, flag)
+		}
 	}
 
 	return program

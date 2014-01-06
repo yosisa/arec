@@ -62,9 +62,7 @@ func TestProgramToDocument(t *testing.T) {
 		Start:     1388653200,
 		End:       1388654100,
 		Duration:  900,
-		New:       false,
-		Final:     false,
-		Rerun:     false,
+		Flag:      nil,
 		UpdatedAt: int(now),
 	})
 
@@ -77,9 +75,7 @@ func TestProgramToDocument(t *testing.T) {
 		Start:     1388654100,
 		End:       1388655000,
 		Duration:  900,
-		New:       false,
-		Final:     false,
-		Rerun:     true,
+		Flag:      []string{"rerun"},
 		UpdatedAt: int(now),
 	})
 
@@ -92,9 +88,7 @@ func TestProgramToDocument(t *testing.T) {
 		Start:     1388655000,
 		End:       1388655900,
 		Duration:  900,
-		New:       true,
-		Final:     false,
-		Rerun:     true,
+		Flag:      []string{"new", "rerun"},
 		UpdatedAt: int(now),
 	})
 
@@ -107,9 +101,7 @@ func TestProgramToDocument(t *testing.T) {
 		Start:     1388655900,
 		End:       1388656800,
 		Duration:  900,
-		New:       false,
-		Final:     true,
-		Rerun:     false,
+		Flag:      []string{"final"},
 		UpdatedAt: int(now),
 	})
 }
