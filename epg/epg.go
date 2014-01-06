@@ -11,6 +11,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 )
 
@@ -155,7 +156,7 @@ func (self *Program) toDocument(now int64) *reserve.Program {
 		category = append(category, cat.Large.Ja, cat.Large.En, cat.Middle.Ja, cat.Middle.En)
 	}
 
-	return &reserve.Program{
+	program := &reserve.Program{
 		Channel:   self.Channel,
 		EventId:   fmt.Sprintf("epg:%s:%d", self.Channel, self.EventId),
 		Title:     self.Title,
@@ -166,4 +167,11 @@ func (self *Program) toDocument(now int64) *reserve.Program {
 		Duration:  self.Duration,
 		UpdatedAt: int(now),
 	}
+
+	if strings.Contains(program.Title, "【再】") {
+		program.Title = strings.Replace(program.Title, "【再】", "", -1)
+		program.Rerun = true
+	}
+
+	return program
 }

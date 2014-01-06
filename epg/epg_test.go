@@ -52,10 +52,8 @@ func TestProgramToDocument(t *testing.T) {
 	defer f.Close()
 
 	channels, err := DecodeJson(f)
-	program := channels[0].Programs[0]
 	now := time.Now().Unix()
-	pg := program.toDocument(now)
-	assert.Equal(t, pg, &reserve.Program{
+	assert.Equal(t, channels[0].Programs[0].toDocument(now), &reserve.Program{
 		Channel:   "GR0_9",
 		EventId:   "epg:GR0_9:100",
 		Title:     "番組1",
@@ -64,6 +62,20 @@ func TestProgramToDocument(t *testing.T) {
 		Start:     1388653200,
 		End:       1388654100,
 		Duration:  900,
+		Rerun:     false,
+		UpdatedAt: int(now),
+	})
+
+	assert.Equal(t, channels[0].Programs[1].toDocument(now), &reserve.Program{
+		Channel:   "GR0_9",
+		EventId:   "epg:GR0_9:101",
+		Title:     "番組1",
+		Detail:    "description here",
+		Category:  []string{"アニメ/特撮", "anime", "国内アニメ", "Japanese animation"},
+		Start:     1388654100,
+		End:       1388655000,
+		Duration:  900,
+		Rerun:     true,
 		UpdatedAt: int(now),
 	})
 }

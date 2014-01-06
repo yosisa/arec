@@ -26,6 +26,7 @@ type Program struct {
 	Start      int
 	End        int
 	Duration   int
+	Rerun      bool
 	ReservedBy []bson.ObjectId `bson:"reserved_by"`
 	UpdatedAt  int             `bson:"updated_at"`
 }
@@ -115,6 +116,7 @@ func (self *Program) MakeHash() []byte {
 		self.Start,
 		self.End,
 		self.Duration,
+		self.Rerun,
 	})
 	return hasher.Sum(nil)
 }
