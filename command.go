@@ -23,16 +23,16 @@ type CmdOptions struct {
 	} `goptions:"rule"`
 }
 
-type SubCommand func(options *CmdOptions)
+type SubCommand func(options *CmdOptions, config *Config)
 
 var commands map[string]SubCommand
 
-func SchedulerCommand(options *CmdOptions) {
+func SchedulerCommand(options *CmdOptions, config *Config) {
 	scheduler := reserve.NewScheduler()
 	scheduler.RunForever()
 }
 
-func RuleCommand(options *CmdOptions) {
+func RuleCommand(options *CmdOptions, config *Config) {
 	rule := reserve.Rule{Keyword: options.Rule.Keyword}
 	if err := rule.Save(); err != nil {
 		log.Fatal(err)
@@ -40,14 +40,25 @@ func RuleCommand(options *CmdOptions) {
 	rule.Apply(0)
 }
 
-func EPGCommand(options *CmdOptions) {
+func EPGCommand(options *CmdOptions, config *Config) {
 	if options.EPG.File != nil {
 		defer options.EPG.File.Close()
 		if err := epg.SaveEPG(options.EPG.File); err != nil {
 			log.Fatal(err)
 		}
-		reserve.ApplyAllRules(0)
 	}
+
+	for _, channel := range config.Channels["GR"] {
+		r, err := epg.GetEPG(config.Recpt1, config.Epgdump, channel.Ch)
+		if err != nil {
+			log.Print(err)
+		} else {
+			if err := epg.SaveEPG(r); err != nil {
+				log.Fatal(err)
+			}
+		}
+	}
+	reserve.ApplyAllRules(0)
 }
 
 func init() {

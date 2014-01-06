@@ -1,3 +1,27 @@
 {
-    "mongo_uri": "mongodb://localhost/arec"
+    "mongo_uri": "mongodb://localhost/arec",
+    "epgdump": "/usr/local/bin/epgdump",
+    "recpt1": "/usr/local/bin/recpt1",
+    "channels": {
+        "GR": [
+            {"ch": "27", "sid": "hd"},
+            {"ch": "26", "sid": "hd"},
+            {"ch": "25", "sid": "hd"},
+            {"ch": "24", "sid": "hd"},
+            {"ch": "22", "sid": "hd"},
+            {"ch": "23", "sid": "hd"},
+            {"ch": "21", "sid": "hd"},
+            {"ch": "20", "sid": "hd"}
+        ],
+        "BS": [
+            {"ch": "101", "sid": "hd"},
+            {"ch": "103", "sid": "hd"},
+            {"ch": "141", "sid": "hd"},
+            {"ch": "151", "sid": "hd"},
+            {"ch": "161", "sid": "hd"},
+            {"ch": "171", "sid": "hd"},
+            {"ch": "181", "sid": "hd"},
+            {"ch": "211", "sid": "hd"}
+        ]
+    }
 }

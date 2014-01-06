@@ -7,6 +7,12 @@ import (
 
 type Config struct {
 	MongoURI string `json:"mongo_uri"`
+	Epgdump  string
+	Recpt1   string
+	Channels map[string][]struct {
+		Ch  string
+		Sid string
+	}
 }
 
 func LoadConfig(path *string) (Config, error) {

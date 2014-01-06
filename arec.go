@@ -26,5 +26,5 @@ func main() {
 	log.Printf("Configuration loaded from %s", options.Config)
 	reserve.Connect(config.MongoURI)
 
-	command(&options)
+	command(&options, &config)
 }
