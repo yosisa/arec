@@ -28,8 +28,8 @@ type SubCommand func(options *CmdOptions, config *Config)
 var commands map[string]SubCommand
 
 func SchedulerCommand(options *CmdOptions, config *Config) {
-	scheduler := reserve.NewScheduler()
-	scheduler.RunForever()
+	recorder := reserve.NewRecorder()
+	recorder.RunForever()
 }
 
 func RuleCommand(options *CmdOptions, config *Config) {

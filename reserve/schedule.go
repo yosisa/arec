@@ -56,17 +56,17 @@ func (self *Schedule) Record() {
 	log.Printf("Finish recording: %s", self.EventId)
 }
 
-type Scheduler struct {
+type Recorder struct {
 	activeItems map[string]*Schedule
 }
 
-func NewScheduler() *Scheduler {
-	scheduler := new(Scheduler)
+func NewRecorder() *Recorder {
+	scheduler := new(Recorder)
 	scheduler.activeItems = make(map[string]*Schedule)
 	return scheduler
 }
 
-func (self *Scheduler) Refresh() {
+func (self *Recorder) Refresh() {
 	var program Program
 	collection := getCollection("program")
 	query := bson.M{
@@ -87,13 +87,13 @@ func (self *Scheduler) Refresh() {
 	}
 }
 
-func (self *Scheduler) Shutdown(force bool) {
+func (self *Recorder) Shutdown(force bool) {
 	for _, schedule := range self.activeItems {
 		schedule.Cancel()
 	}
 }
 
-func (self *Scheduler) RunForever() {
+func (self *Recorder) RunForever() {
 	self.Refresh()
 	signalCh := make(chan os.Signal, 4)
 	signal.Notify(signalCh, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT)
