@@ -1,6 +1,8 @@
 package reserve
 
 import (
+	"container/heap"
+	"fmt"
 	"labix.org/v2/mgo/bson"
 	"log"
 	"os"
@@ -8,6 +10,89 @@ import (
 	"syscall"
 	"time"
 )
+
+type Timeline []*Program
+
+func NewTimeline() *Timeline {
+	t := new(Timeline)
+	heap.Init(t)
+	return t
+}
+
+func (t Timeline) Len() int {
+	return len(t)
+}
+
+func (t Timeline) Less(i, j int) bool {
+	return t[i].Start < t[j].Start
+}
+
+func (t Timeline) Swap(i, j int) {
+	t[i], t[j] = t[j], t[i]
+}
+
+func (t *Timeline) Push(x interface{}) {
+	*t = append(*t, x.(*Program))
+}
+
+func (t *Timeline) Pop() interface{} {
+	old := *t
+	n := len(old)
+	x := old[n-1]
+	*t = old[:n-1]
+	return x
+}
+
+func (t *Timeline) Set(s *Program) error {
+	for _, item := range *t {
+		if item.Start >= s.End {
+			break
+		}
+		if s.Start-item.End < 0 {
+			return fmt.Errorf("Duplicated schedule")
+		}
+	}
+	heap.Push(t, s)
+	return nil
+}
+
+type Scheduler struct {
+	GR []*Timeline
+	BS []*Timeline
+}
+
+func NewScheduler(gr int, bs int) *Scheduler {
+	tuner := new(Scheduler)
+	tuner.GR = make([]*Timeline, gr)
+	tuner.BS = make([]*Timeline, bs)
+	for i, _ := range tuner.GR {
+		tuner.GR[i] = NewTimeline()
+	}
+	for i, _ := range tuner.BS {
+		tuner.BS[i] = NewTimeline()
+	}
+
+	return tuner
+}
+
+func (t *Scheduler) Reserve(s *Program) error {
+	for _, tl := range t.getTimelines(s.Channel) {
+		if err := tl.Set(s); err == nil {
+			return nil
+		}
+	}
+	return fmt.Errorf("Not Reserved")
+}
+
+func (t *Scheduler) getTimelines(channel string) []*Timeline {
+	switch channel[:2] {
+	case "GR":
+		return t.GR
+	case "BS":
+		return t.BS
+	}
+	return nil
+}
 
 type Schedule struct {
 	EventId   string
