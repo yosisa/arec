@@ -81,19 +81,7 @@ func SaveEPG(r io.Reader, ch string) error {
 
 func GetEPG(recpt1 string, epgdump string, ch string) (*bytes.Reader, error) {
 	log.Printf("Get EPG data: %s", ch)
-	recpt1Cmd := exec.Command(recpt1, "--sid", "epg", ch, "90", "-")
 	epgdumpCmd := exec.Command(epgdump, "json", "-", "-")
-
-	recpt1Out, err := recpt1Cmd.StdoutPipe()
-	if err != nil {
-		return nil, err
-	}
-
-	recpt1Err, err := recpt1Cmd.StderrPipe()
-	if err != nil {
-		return nil, err
-	}
-	go io.Copy(os.Stdout, recpt1Err)
 
 	epgdumpIn, err := epgdumpCmd.StdinPipe()
 	if err != nil {
@@ -111,23 +99,14 @@ func GetEPG(recpt1 string, epgdump string, ch string) (*bytes.Reader, error) {
 	}
 	go io.Copy(os.Stdout, epgdumpErr)
 
-	if err := recpt1Cmd.Start(); err != nil {
-		return nil, err
-	}
+	pt1 := reserve.NewRecpt1(recpt1, ch, "epg")
+	pt1.Start(epgdumpIn)
+	pt1.CloseAfter(90 * time.Second)
 
 	if err := epgdumpCmd.Start(); err != nil {
 		return nil, err
 	}
 
-	// redirect stdout of recpt1 to stdin of epgdump
-	io.Copy(epgdumpIn, recpt1Out)
-
-	if err := recpt1Cmd.Wait(); err != nil {
-		log.Print(err)
-	}
-
-	// close stdin explicitly because epgdump's pipes not close automatically by exiting recpt1
-	epgdumpIn.Close()
 	// read all from pipe to avoid blocking by wait method
 	epgdata, _ := ioutil.ReadAll(epgdumpOut)
 	epg := bytes.NewReader(epgdata)
