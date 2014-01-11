@@ -92,7 +92,9 @@ func (self *Program) Save() error {
 		return nil
 	}
 
-	info, err := collection.Upsert(bson.M{"event_id": self.EventId}, self)
+	pg := new(Program)
+	query := collection.Find(bson.M{"event_id": self.EventId})
+	info, err := query.Apply(mgo.Change{Update: self, Upsert: true}, pg)
 	if err != nil {
 		return err
 	}
@@ -101,6 +103,7 @@ func (self *Program) Save() error {
 	}
 	if info.Updated > 0 {
 		log.Printf("Update program: %s %d %s", self.EventId, self.Start, self.Title)
+		log.Printf("Old: %+v, New: %+v", *pg, *self)
 	}
 	return nil
 }
