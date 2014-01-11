@@ -61,6 +61,19 @@ func DecodeJson(r io.Reader) ([]Channel, error) {
 	return channels, dec.Decode(&channels)
 }
 
+func GetAndSaveEPG(recpt1, epgdump, channel string) error {
+	r, err := GetEPG(recpt1, epgdump, channel)
+	if err != nil {
+		return err
+	}
+
+	if err := SaveEPG(r, channel); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func SaveEPG(r io.Reader, ch string) error {
 	channels, err := DecodeJson(r)
 	if err != nil {

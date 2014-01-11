@@ -49,24 +49,14 @@ func EPGCommand(options *CmdOptions, config *Config) {
 	}
 
 	for _, channel := range config.Channels["GR"] {
-		r, err := epg.GetEPG(config.Recpt1, config.Epgdump, channel.Ch)
-		if err != nil {
+		if err := epg.GetAndSaveEPG(config.Recpt1, config.Epgdump, channel.Ch); err != nil {
 			log.Print(err)
-		} else {
-			if err := epg.SaveEPG(r, channel.Ch); err != nil {
-				log.Fatal(err)
-			}
 		}
 	}
 
 	if bs, ok := config.Channels["BS"]; ok && len(bs) > 0 {
-		channel := bs[0]
-		if r, err := epg.GetEPG(config.Recpt1, config.Epgdump, channel.Ch); err != nil {
+		if err := epg.GetAndSaveEPG(config.Recpt1, config.Epgdump, bs[0].Ch); err != nil {
 			log.Print(err)
-		} else {
-			if err := epg.SaveEPG(r, channel.Ch); err != nil {
-				log.Print(err)
-			}
 		}
 	}
 
