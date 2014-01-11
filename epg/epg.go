@@ -61,8 +61,8 @@ func DecodeJson(r io.Reader) ([]Channel, error) {
 	return channels, dec.Decode(&channels)
 }
 
-func GetAndSaveEPG(recpt1, epgdump, channel string) error {
-	r, err := GetEPG(recpt1, epgdump, channel)
+func GetAndSaveEPG(recpt1, epgdump, channel string, duration time.Duration) error {
+	r, err := GetEPG(recpt1, epgdump, channel, duration)
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func SaveEPG(r io.Reader, ch string) error {
 	return nil
 }
 
-func GetEPG(recpt1 string, epgdump string, ch string) (*bytes.Reader, error) {
+func GetEPG(recpt1 string, epgdump string, ch string, duration time.Duration) (*bytes.Reader, error) {
 	log.Printf("Get EPG data: %s", ch)
 	epgdumpCmd := exec.Command(epgdump, "json", "-", "-")
 
@@ -107,7 +107,7 @@ func GetEPG(recpt1 string, epgdump string, ch string) (*bytes.Reader, error) {
 
 	pt1 := reserve.NewRecpt1(recpt1, ch, "epg")
 	pt1.Start(epgdumpIn)
-	pt1.CloseAfter(90 * time.Second)
+	pt1.CloseAfter(duration)
 
 	if err := epgdumpCmd.Start(); err != nil {
 		return nil, err

@@ -6,6 +6,12 @@ import (
 	"github.com/yosisa/arec/reserve"
 	"log"
 	"os"
+	"time"
+)
+
+const (
+	GR_REC_TIME = 90 * time.Second
+	BS_REC_TIME = 300 * time.Second
 )
 
 type CmdOptions struct {
@@ -49,13 +55,13 @@ func EPGCommand(options *CmdOptions, config *Config) {
 	}
 
 	for _, channel := range config.Channels["GR"] {
-		if err := epg.GetAndSaveEPG(config.Recpt1, config.Epgdump, channel.Ch); err != nil {
+		if err := epg.GetAndSaveEPG(config.Recpt1, config.Epgdump, channel.Ch, GR_REC_TIME); err != nil {
 			log.Print(err)
 		}
 	}
 
 	if bs, ok := config.Channels["BS"]; ok && len(bs) > 0 {
-		if err := epg.GetAndSaveEPG(config.Recpt1, config.Epgdump, bs[0].Ch); err != nil {
+		if err := epg.GetAndSaveEPG(config.Recpt1, config.Epgdump, bs[0].Ch, BS_REC_TIME); err != nil {
 			log.Print(err)
 		}
 	}
