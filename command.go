@@ -58,6 +58,18 @@ func EPGCommand(options *CmdOptions, config *Config) {
 			}
 		}
 	}
+
+	if bs, ok := config.Channels["BS"]; ok && len(bs) > 0 {
+		channel := bs[0]
+		if r, err := epg.GetEPG(config.Recpt1, config.Epgdump, channel.Ch); err != nil {
+			log.Print(err)
+		} else {
+			if err := epg.SaveEPG(r, channel.Ch); err != nil {
+				log.Print(err)
+			}
+		}
+	}
+
 	reserve.ApplyAllRules(0)
 }
 
