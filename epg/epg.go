@@ -9,7 +9,6 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -92,12 +91,6 @@ func GetEPG(recpt1 string, epgdump string, ch string) (*bytes.Reader, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	epgdumpErr, err := epgdumpCmd.StderrPipe()
-	if err != nil {
-		return nil, err
-	}
-	go io.Copy(os.Stdout, epgdumpErr)
 
 	pt1 := reserve.NewRecpt1(recpt1, ch, "epg")
 	pt1.Start(epgdumpIn)
