@@ -132,6 +132,7 @@ func (self *Channel) toDocument(ch string) *reserve.Channel {
 	return &reserve.Channel{
 		Id:   self.Id,
 		Name: self.Name,
+		Type: self.Id[:2],
 		Ch:   ch,
 		Sid:  self.ServiceId,
 	}

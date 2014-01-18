@@ -39,6 +39,7 @@ func TestChannelToDocument(t *testing.T) {
 	assert.Equal(t, ch, &reserve.Channel{
 		Id:   "GR0_9",
 		Name: "Test TV1",
+		Type: "GR",
 		Ch:   "1",
 		Sid:  9,
 	})

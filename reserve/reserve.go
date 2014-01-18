@@ -11,6 +11,7 @@ import (
 type Channel struct {
 	Id   string `bson:"_id"`
 	Name string
+	Type string
 	Ch   string
 	Sid  int
 }
