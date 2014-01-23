@@ -106,10 +106,19 @@ func GetEPG(recpt1 string, epgdump string, ch string, duration time.Duration) (*
 	}
 
 	pt1 := reserve.NewRecpt1(recpt1, ch, "epg")
-	pt1.Start(epgdumpIn)
+	pt1Out, err := pt1.Start()
+	if err != nil {
+		return nil, err
+	}
+
 	pt1.CloseAfter(duration)
+	go func() {
+		io.Copy(epgdumpIn, pt1Out)
+		epgdumpIn.Close()
+	}()
 
 	if err := epgdumpCmd.Start(); err != nil {
+		pt1.Close()
 		return nil, err
 	}
 

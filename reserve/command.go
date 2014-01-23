@@ -26,7 +26,7 @@ func NewRecpt1(path, channel, sid string) *Recpt1 {
 	return pt1
 }
 
-func (pt1 *Recpt1) Start(w io.WriteCloser) error {
+func (pt1 *Recpt1) Start() (io.Reader, error) {
 	args := make([]string, 0)
 	switch pt1.Sid {
 	case "":
@@ -42,24 +42,19 @@ func (pt1 *Recpt1) Start(w io.WriteCloser) error {
 
 	stdout, err := pt1.cmd.StdoutPipe()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	stderr, err := pt1.cmd.StderrPipe()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	go io.Copy(os.Stderr, stderr)
 
 	if err := pt1.cmd.Start(); err != nil {
-		return err
+		return nil, err
 	}
-
-	go func() {
-		io.Copy(w, stdout)
-		w.Close()
-	}()
-	return nil
+	return stdout, nil
 }
 
 func (pt1 *Recpt1) Close() error {
