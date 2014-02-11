@@ -12,6 +12,7 @@ import (
 )
 
 type RecordInfo struct {
+	Type     string
 	Id       string
 	Ch       string
 	Sid      string
@@ -86,22 +87,19 @@ func NewScheduler(gr int, bs int) *Scheduler {
 }
 
 func (t *Scheduler) Reserve(ri *RecordInfo) error {
-	for _, tl := range t.getTimelines(ri.Ch) {
+	var timelines []*Timeline
+	if ri.Type == "GR" {
+		timelines = t.GR
+	} else {
+		timelines = t.BS
+	}
+
+	for _, tl := range timelines {
 		if err := tl.Set(ri); err == nil {
 			return nil
 		}
 	}
 	return fmt.Errorf("Not Reserved")
-}
-
-func (t *Scheduler) getTimelines(channel string) []*Timeline {
-	switch channel[:2] {
-	case "GR":
-		return t.GR
-	case "BS":
-		return t.BS
-	}
-	return nil
 }
 
 type Schedule struct {

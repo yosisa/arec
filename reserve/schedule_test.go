@@ -36,15 +36,15 @@ func TestTimeline(t *testing.T) {
 
 func TestScheduler(t *testing.T) {
 	s := NewScheduler(2, 2)
-	gr1 := &RecordInfo{Ch: "GR0_1", Start: 50, End: 100}
-	gr2 := &RecordInfo{Ch: "GR0_1", Start: 100, End: 150}
-	gr3 := &RecordInfo{Ch: "GR0_2", Start: 50, End: 150}
-	gr4 := &RecordInfo{Ch: "GR0_3", Start: 100, End: 150}
+	gr1 := &RecordInfo{Type: "GR", Ch: "1", Start: 50, End: 100}
+	gr2 := &RecordInfo{Type: "GR", Ch: "1", Start: 100, End: 150}
+	gr3 := &RecordInfo{Type: "GR", Ch: "2", Start: 50, End: 150}
+	gr4 := &RecordInfo{Type: "GR", Ch: "3", Start: 100, End: 150}
 
-	bs1 := &RecordInfo{Ch: "BS_1", Start: 0, End: 100}
-	bs2 := &RecordInfo{Ch: "BS_2", Start: 50, End: 150}
-	bs3 := &RecordInfo{Ch: "BS_1", Start: 100, End: 200}
-	bs4 := &RecordInfo{Ch: "BS_3", Start: 120, End: 160}
+	bs1 := &RecordInfo{Type: "BS", Ch: "1", Start: 0, End: 100}
+	bs2 := &RecordInfo{Type: "BS", Ch: "2", Start: 50, End: 150}
+	bs3 := &RecordInfo{Type: "BS", Ch: "1", Start: 100, End: 200}
+	bs4 := &RecordInfo{Type: "BS", Ch: "3", Start: 120, End: 160}
 
 	assert.Nil(t, s.Reserve(gr1))
 	assert.Nil(t, s.Reserve(gr2))
