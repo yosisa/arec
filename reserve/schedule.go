@@ -11,7 +11,17 @@ import (
 	"time"
 )
 
-type Timeline []*Program
+type RecordInfo struct {
+	Id       string
+	Ch       string
+	Sid      string
+	Start    int
+	End      int
+	timer    *time.Timer
+	cancelCh chan bool
+}
+
+type Timeline []*RecordInfo
 
 func NewTimeline() *Timeline {
 	t := new(Timeline)
@@ -32,7 +42,7 @@ func (t Timeline) Swap(i, j int) {
 }
 
 func (t *Timeline) Push(x interface{}) {
-	*t = append(*t, x.(*Program))
+	*t = append(*t, x.(*RecordInfo))
 }
 
 func (t *Timeline) Pop() interface{} {
@@ -43,16 +53,16 @@ func (t *Timeline) Pop() interface{} {
 	return x
 }
 
-func (t *Timeline) Set(s *Program) error {
+func (t *Timeline) Set(ri *RecordInfo) error {
 	for _, item := range *t {
-		if item.Start >= s.End {
+		if item.Start >= ri.End {
 			break
 		}
-		if s.Start-item.End < 0 {
+		if ri.Start-item.End < 0 {
 			return fmt.Errorf("Duplicated schedule")
 		}
 	}
-	heap.Push(t, s)
+	heap.Push(t, ri)
 	return nil
 }
 
@@ -75,9 +85,9 @@ func NewScheduler(gr int, bs int) *Scheduler {
 	return tuner
 }
 
-func (t *Scheduler) Reserve(s *Program) error {
-	for _, tl := range t.getTimelines(s.Channel) {
-		if err := tl.Set(s); err == nil {
+func (t *Scheduler) Reserve(ri *RecordInfo) error {
+	for _, tl := range t.getTimelines(ri.Ch) {
+		if err := tl.Set(ri); err == nil {
 			return nil
 		}
 	}
