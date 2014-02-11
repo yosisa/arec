@@ -21,7 +21,7 @@ func main() {
 	}
 
 	config, err := LoadConfig(&options.Config)
-	reserve.Recpt1Path = config.Recpt1
+	command.Recpt1Path = config.Recpt1
 	command.EpgdumpPath = config.Epgdump
 	if err != nil {
 		log.Fatalf("Load configuration from %s failed: %v", options.Config, err)

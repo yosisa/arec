@@ -1,6 +1,7 @@
 package reserve
 
 import (
+	"github.com/yosisa/arec/command"
 	"io"
 	"log"
 	"os"
@@ -55,7 +56,7 @@ func (e *Engine) Reserve(item RecorderItem) error {
 
 func (e *Engine) Record(item RecorderItem) {
 	info := item.Info()
-	recpt1 := NewRecpt1(info.Ch, info.Sid)
+	recpt1 := command.NewRecpt1(info.Ch, info.Sid)
 	duration := time.Unix(int64(info.End), 0).Sub(time.Now())
 	recpt1.CloseAfter(duration)
 	io.Copy(item, recpt1)

@@ -1,4 +1,4 @@
-package reserve
+package command
 
 import (
 	"io"
