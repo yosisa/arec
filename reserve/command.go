@@ -15,6 +15,7 @@ type Recpt1 struct {
 	Channel  string
 	Sid      string
 	cmd      *exec.Cmd
+	reader   io.ReadCloser
 	timer    *time.Timer
 	cancelCh chan bool
 }
@@ -28,7 +29,7 @@ func NewRecpt1(channel, sid string) *Recpt1 {
 	return pt1
 }
 
-func (pt1 *Recpt1) Start() (io.Reader, error) {
+func (pt1 *Recpt1) Start() (io.ReadCloser, error) {
 	args := make([]string, 0)
 	switch pt1.Sid {
 	case "":
@@ -57,6 +58,17 @@ func (pt1 *Recpt1) Start() (io.Reader, error) {
 		return nil, err
 	}
 	return stdout, nil
+}
+
+func (pt1 *Recpt1) Read(p []byte) (n int, err error) {
+	if pt1.reader == nil {
+		if stdout, err := pt1.Start(); err != nil {
+			return 0, err
+		} else {
+			pt1.reader = stdout
+		}
+	}
+	return pt1.reader.Read(p)
 }
 
 func (pt1 *Recpt1) Close() error {

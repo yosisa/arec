@@ -87,6 +87,7 @@ func SaveEPG(r io.Reader, ch string) error {
 			program.Save(now)
 		}
 	}
+	reserve.ApplyAllRules(int(now))
 
 	return nil
 }
