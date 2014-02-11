@@ -1,15 +1,11 @@
 package epg
 
 import (
-	"bytes"
 	"code.google.com/p/go.text/unicode/norm"
 	"encoding/json"
 	"fmt"
 	"github.com/yosisa/arec/reserve"
 	"io"
-	"io/ioutil"
-	"log"
-	"os/exec"
 	"strings"
 	"time"
 )
@@ -61,19 +57,6 @@ func DecodeJson(r io.Reader) ([]Channel, error) {
 	return channels, dec.Decode(&channels)
 }
 
-func GetAndSaveEPG(epgdump, channel string, duration time.Duration) error {
-	r, err := GetEPG(epgdump, channel, duration)
-	if err != nil {
-		return err
-	}
-
-	if err := SaveEPG(r, channel); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func SaveEPG(r io.Reader, ch string) error {
 	channels, err := DecodeJson(r)
 	if err != nil {
@@ -90,48 +73,6 @@ func SaveEPG(r io.Reader, ch string) error {
 	reserve.ApplyAllRules(int(now))
 
 	return nil
-}
-
-func GetEPG(epgdump string, ch string, duration time.Duration) (*bytes.Reader, error) {
-	log.Printf("Get EPG data: %s", ch)
-	epgdumpCmd := exec.Command(epgdump, "json", "-", "-")
-
-	epgdumpIn, err := epgdumpCmd.StdinPipe()
-	if err != nil {
-		return nil, err
-	}
-
-	epgdumpOut, err := epgdumpCmd.StdoutPipe()
-	if err != nil {
-		return nil, err
-	}
-
-	pt1 := reserve.NewRecpt1(ch, "epg")
-	pt1Out, err := pt1.Start()
-	if err != nil {
-		return nil, err
-	}
-
-	pt1.CloseAfter(duration)
-	go func() {
-		io.Copy(epgdumpIn, pt1Out)
-		epgdumpIn.Close()
-	}()
-
-	if err := epgdumpCmd.Start(); err != nil {
-		pt1.Close()
-		return nil, err
-	}
-
-	// read all from pipe to avoid blocking by wait method
-	epgdata, _ := ioutil.ReadAll(epgdumpOut)
-	epg := bytes.NewReader(epgdata)
-
-	if err := epgdumpCmd.Wait(); err != nil {
-		log.Print(err)
-	}
-
-	return epg, nil
 }
 
 func (self *Channel) Save(ch string) error {
