@@ -20,6 +20,7 @@ func main() {
 	}
 
 	config, err := LoadConfig(&options.Config)
+	reserve.Recpt1Path = config.Recpt1
 	if err != nil {
 		log.Fatalf("Load configuration from %s failed: %v", options.Config, err)
 	}

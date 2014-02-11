@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+var Recpt1Path = "/usr/local/bin/recpt1"
+
 type Recpt1 struct {
 	Path     string
 	Channel  string
@@ -17,9 +19,9 @@ type Recpt1 struct {
 	cancelCh chan bool
 }
 
-func NewRecpt1(path, channel, sid string) *Recpt1 {
+func NewRecpt1(channel, sid string) *Recpt1 {
 	pt1 := new(Recpt1)
-	pt1.Path = path
+	pt1.Path = Recpt1Path
 	pt1.Channel = channel
 	pt1.Sid = sid
 	pt1.cancelCh = make(chan bool)

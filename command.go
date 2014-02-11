@@ -55,13 +55,13 @@ func EPGCommand(options *CmdOptions, config *Config) {
 	}
 
 	for _, channel := range config.Channels["GR"] {
-		if err := epg.GetAndSaveEPG(config.Recpt1, config.Epgdump, channel.Ch, GR_REC_TIME); err != nil {
+		if err := epg.GetAndSaveEPG(config.Epgdump, channel.Ch, GR_REC_TIME); err != nil {
 			log.Print(err)
 		}
 	}
 
 	if bs, ok := config.Channels["BS"]; ok && len(bs) > 0 {
-		if err := epg.GetAndSaveEPG(config.Recpt1, config.Epgdump, bs[0].Ch, BS_REC_TIME); err != nil {
+		if err := epg.GetAndSaveEPG(config.Epgdump, bs[0].Ch, BS_REC_TIME); err != nil {
 			log.Print(err)
 		}
 	}
