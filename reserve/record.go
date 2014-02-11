@@ -61,6 +61,7 @@ func (e *Engine) Record(item RecorderItem) {
 	recpt1.CloseAfter(duration)
 	io.Copy(item, recpt1)
 	item.Close()
+	e.Scheduler.Cancel(info)
 }
 
 func (e *Engine) RunForever() {

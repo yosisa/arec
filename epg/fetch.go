@@ -1,6 +1,7 @@
 package epg
 
 import (
+	"fmt"
 	"github.com/yosisa/arec/command"
 	"github.com/yosisa/arec/reserve"
 	"log"
@@ -27,6 +28,7 @@ func NewEpgRecord(type_, ch string, start time.Time) *EpgRecord {
 
 	epg := new(EpgRecord)
 	epg.recordInfo = &reserve.RecordInfo{
+		Id:    fmt.Sprintf("EPG-%s%s", type_, ch),
 		Type:  type_,
 		Ch:    ch,
 		Sid:   "epg",

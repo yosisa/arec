@@ -67,6 +67,17 @@ func (t *Timeline) Set(ri *RecordInfo) error {
 	return nil
 }
 
+func (t *Timeline) Remove(ri *RecordInfo) error {
+	for i, item := range *t {
+		if item.Id == ri.Id {
+			old := *t
+			*t = append(old[:i], old[i+1:]...)
+			return nil
+		}
+	}
+	return fmt.Errorf("Not found")
+}
+
 type Scheduler struct {
 	GR []*Timeline
 	BS []*Timeline
@@ -87,19 +98,29 @@ func NewScheduler(gr int, bs int) *Scheduler {
 }
 
 func (t *Scheduler) Reserve(ri *RecordInfo) error {
-	var timelines []*Timeline
-	if ri.Type == "GR" {
-		timelines = t.GR
-	} else {
-		timelines = t.BS
-	}
-
-	for _, tl := range timelines {
+	for _, tl := range t.getTimelines(ri.Type) {
 		if err := tl.Set(ri); err == nil {
 			return nil
 		}
 	}
-	return fmt.Errorf("Not Reserved")
+	return fmt.Errorf("Not reserved")
+}
+
+func (t *Scheduler) Cancel(ri *RecordInfo) error {
+	for _, tl := range t.getTimelines(ri.Type) {
+		if err := tl.Remove(ri); err == nil {
+			return nil
+		}
+	}
+	return fmt.Errorf("Not reserved")
+}
+
+func (t *Scheduler) getTimelines(type_ string) []*Timeline {
+	if type_ == "GR" {
+		return t.GR
+	} else {
+		return t.BS
+	}
 }
 
 type Schedule struct {
