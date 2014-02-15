@@ -55,15 +55,18 @@ func EPGCommand(options *CmdOptions, config *Config) {
 	}
 
 	engine := reserve.NewEngine(2, 2)
-	for _, channel := range config.Channels["GR"] {
-		epg.Reserve(engine, "GR", channel.Ch)
-	}
+	updateEPG := func() {
+		for _, channel := range config.Channels["GR"] {
+			epg.Reserve(engine, "GR", channel.Ch)
+		}
 
-	if bs, ok := config.Channels["BS"]; ok && len(bs) > 0 {
-		epg.Reserve(engine, "BS", bs[0].Ch)
+		if bs, ok := config.Channels["BS"]; ok && len(bs) > 0 {
+			epg.Reserve(engine, "BS", bs[0].Ch)
+		}
 	}
+	updateEPG()
 
-	engine.RunForever()
+	engine.RunForever(updateEPG)
 }
 
 func init() {
