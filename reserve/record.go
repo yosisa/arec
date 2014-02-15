@@ -73,6 +73,22 @@ func (e *Engine) Record(item RecorderItem) {
 	delete(e.reserved, info.Id)
 }
 
+func (e *Engine) ReserveFromDB() {
+	programs, err := GetReservedPrograms()
+	if err != nil {
+		log.Print(err)
+	}
+
+	for _, program := range programs {
+		if channel, err := GetChannel(&program.Channel); err != nil {
+			log.Print(err)
+		} else {
+			record := NewFileRecord(channel, program)
+			e.Reserve(record)
+		}
+	}
+}
+
 func (e *Engine) RunForever(handler func()) {
 	signalCh := make(chan os.Signal, 4)
 	signal.Notify(signalCh, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT)

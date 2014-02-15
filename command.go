@@ -34,8 +34,9 @@ type SubCommand func(options *CmdOptions, config *Config)
 var commands map[string]SubCommand
 
 func SchedulerCommand(options *CmdOptions, config *Config) {
-	recorder := reserve.NewRecorder()
-	recorder.RunForever()
+	engine := reserve.NewEngine(2, 0)
+	engine.ReserveFromDB()
+	engine.RunForever(engine.ReserveFromDB)
 }
 
 func RuleCommand(options *CmdOptions, config *Config) {

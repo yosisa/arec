@@ -6,6 +6,7 @@ import (
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"log"
+	"time"
 )
 
 type Channel struct {
@@ -123,4 +124,14 @@ func (self *Program) MakeHash() []byte {
 		self.Flag,
 	})
 	return hasher.Sum(nil)
+}
+
+func GetReservedPrograms() ([]Program, error) {
+	var programs []Program
+	collection := getCollection("program")
+	query := collection.Find(bson.M{
+		"reserved_by.0": bson.M{"$exists": true},
+		"end":           bson.M{"$gt": int(time.Now().Unix())},
+	})
+	return programs, query.All(&programs)
 }
