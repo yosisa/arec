@@ -1,12 +1,15 @@
 package main
 
 import (
-	"github.com/voxelbrain/goptions"
-	"github.com/yosisa/arec/epg"
-	"github.com/yosisa/arec/reserve"
+	"fmt"
 	"log"
 	"os"
 	"time"
+
+	"github.com/codegangsta/cli"
+	"github.com/yosisa/arec/command"
+	"github.com/yosisa/arec/epg"
+	"github.com/yosisa/arec/reserve"
 )
 
 const (
@@ -14,47 +17,74 @@ const (
 	BS_REC_TIME = 300 * time.Second
 )
 
-type CmdOptions struct {
-	Config string        `goptions:"-c, --config, description='Path to config file'"`
-	Help   goptions.Help `goptions:"-h, --help, description='Show this help'"`
-	goptions.Verbs
+var app *cli.App
 
-	EPG struct {
-		Ch   string   `goptions:"--ch, description='Get specified channel only'"`
-		File *os.File `goptions:"--file, rdonly, description='Feed from json file'"`
-	} `goptions:"epg"`
-	Scheduler struct{} `goptions:"scheduler"`
-	Rule      struct {
-		Keyword string `goptions:"--keyword, obligatory, description='regex for title'"`
-	} `goptions:"rule"`
+func init() {
+	app = cli.NewApp()
+	app.Name = "arec"
+	app.Usage = "Japanese TV recorder"
+	app.Flags = []cli.Flag{
+		cli.StringFlag{"config, c", "arec.json", "Config file"},
+	}
+	app.Commands = []cli.Command{
+		{
+			Name:   "run",
+			Usage:  "Run scheduler",
+			Action: CmdScheduler,
+		},
+		{
+			Name:  "rule",
+			Usage: "Manage auto reservation rules",
+			Flags: []cli.Flag{
+				cli.StringFlag{"title, t", "", "Regexp for title"},
+			},
+			Action: CmdRule,
+		},
+		{
+			Name:  "epg",
+			Usage: "Update EPG data",
+			Flags: []cli.Flag{
+				cli.StringFlag{"ch", "", "Update a given channel only"},
+				cli.StringFlag{"json", "", "Feed from a given json file"},
+			},
+			Action: CmdEPG,
+		},
+	}
 }
 
-type SubCommand func(options *CmdOptions, config *Config)
-
-var commands map[string]SubCommand
-
-func SchedulerCommand(options *CmdOptions, config *Config) {
+func CmdScheduler(c *cli.Context) {
 	engine := reserve.NewEngine(2, 0)
 	engine.ReserveFromDB()
 	engine.RunForever(engine.ReserveFromDB)
 }
 
-func RuleCommand(options *CmdOptions, config *Config) {
-	rule := reserve.Rule{Keyword: options.Rule.Keyword}
+func CmdRule(c *cli.Context) {
+	title := c.String("title")
+	if title == "" {
+		log.Fatal("One or more conditions needed.")
+	}
+	rule := reserve.Rule{Keyword: title}
 	if err := rule.Save(); err != nil {
 		log.Fatal(err)
 	}
 	rule.Apply(0)
 }
 
-func EPGCommand(options *CmdOptions, config *Config) {
-	if options.EPG.File != nil {
-		defer options.EPG.File.Close()
-		if err := epg.SaveEPG(options.EPG.File, options.EPG.Ch); err != nil {
+func CmdEPG(c *cli.Context) {
+	if path := c.String("json"); path != "" {
+		f, err := os.Open(path)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		defer f.Close()
+
+		if err := epg.SaveEPG(f, c.String("ch")); err != nil {
 			log.Fatal(err)
 		}
 	}
 
+	config := LoadConfigAndInit(c)
 	engine := reserve.NewEngine(2, 2)
 	updateEPG := func() {
 		for _, channel := range config.Channels["GR"] {
@@ -70,10 +100,17 @@ func EPGCommand(options *CmdOptions, config *Config) {
 	engine.RunForever(updateEPG)
 }
 
-func init() {
-	commands = map[string]SubCommand{
-		"scheduler": SchedulerCommand,
-		"rule":      RuleCommand,
-		"epg":       EPGCommand,
+func LoadConfigAndInit(c *cli.Context) *Config {
+	path := c.GlobalString("config")
+	config, err := LoadConfig(path)
+	if err != nil {
+		log.Fatalf("Load configuration %s failed: %v", path, err)
 	}
+
+	log.Printf("Configuration loaded from %s", path)
+	command.Recpt1Path = config.Recpt1
+	command.EpgdumpPath = config.Epgdump
+	reserve.Connect(config.MongoURI)
+
+	return config
 }

@@ -15,14 +15,16 @@ type Config struct {
 	}
 }
 
-func LoadConfig(path *string) (Config, error) {
-	var config Config
-	f, err := os.Open(*path)
+func LoadConfig(path string) (*Config, error) {
+	f, err := os.Open(path)
 	if err != nil {
-		return config, err
+		return nil, err
 	}
 	defer f.Close()
 
-	dec := json.NewDecoder(f)
-	return config, dec.Decode(&config)
+	var config Config
+	if err := json.NewDecoder(f).Decode(&config); err != nil {
+		return nil, err
+	}
+	return &config, nil
 }
